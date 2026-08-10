@@ -1,0 +1,8 @@
+{
+  "name": "sonar-aso",
+  "description": "App Store Optimization skills for Sonar — keyword research, metadata optimization, competitor analysis, ASO audits, review mining, revenue analysis, rank tracking, and screenshot generation for iOS and Android.",
+  "version": "1.0.0",
+  "author": { "name": "Sonar", "url": "https://trysonar.app" },
+  "homepage": "https://trysonar.app",
+  "license": "MIT"
+}
