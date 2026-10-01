@@ -2,7 +2,7 @@
 name: metadata-optimization
 description: When the user wants to write or improve App Store or Google Play metadata — title, subtitle, keyword field, short description, or description. Also use when the user mentions "optimize my listing", "app title ideas", "subtitle", "keyword field", "app description", or "metadata". For choosing which keywords to target first, see keyword-research. For scoring the current listing, see aso-audit.
 metadata:
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # Metadata optimization
@@ -13,18 +13,18 @@ You are an expert ASO copywriter. Your goal is to turn a keyword strategy into s
 
 1. Check for `app-marketing-context.md` — read it for positioning and audience
 2. Get the app: `sonar_app_lookup` (store id) or `sonar_app_search` (by name) for the current title, subtitle, and description
-3. Get the target keywords — from the user, from a prior `keyword-research` run, or bootstrap with `sonar_app_extract_keywords` on the app and its top competitor
+3. Get the target keywords — from the user, from a prior `keyword-research` run, from `sonar_discovered_keywords` if the app is tracked in Sonar, or bootstrap with `sonar_app_extract_keywords` on the app and its top competitor
 4. Confirm store and country — metadata rules and indexed fields differ
 
 ## Process
 
 ### Step 1: Baseline
 
-Run `sonar_app_aso_score` on the current listing. Note which sub-scores drag (title keyword use, subtitle, description length, screenshot count, rating volume). This is the before picture.
+Run `sonar_app_aso_score` on the current listing. It returns a 0–100 `score` and `checks[]` (Title Length, Title Keywords, Description Length, Description Quality, Screenshots, Rating, Review Count, Recent Update, Release Notes), each with `score`/`maxScore`, a `status`, and a `tip`. Note which metadata checks drag — this is the before picture.
 
 ### Step 2: Verify keyword choices
 
-Batch the proposed keywords through `sonar_keyword_metrics` (up to 25 per call). Drop anything with near-zero popularity; flag `beatable: true` terms as must-place. Character budget is scarce — every placed keyword must earn it.
+Batch the proposed keywords through `sonar_keyword_metrics` (`keywords`, up to 25 per call). Drop anything with near-zero popularity; flag `beatable: true` terms as must-place. Character budget is scarce — every placed keyword must earn it.
 
 ### Step 3: Draft 3 variants
 
@@ -49,11 +49,15 @@ Remaining strategy terms, comma-separated, no spaces, singular forms, no duplica
 - No keyword repeated across indexed fields (iOS)
 - Core terms appear 2–3x naturally in the Android description
 - Title still reads as a product, not a keyword soup
-- Localized metadata: re-run keyword metrics per country before translating — direct translations of winning US keywords are often not what locals search
+- Localized metadata: re-run `sonar_keyword_metrics` with the target `country` before translating — direct translations of winning US keywords are often not what locals search
+
+## After shipping
+
+If the app is tracked in Sonar, make sure every placed keyword is tracked (`sonar_track_keywords`, up to 200 per call) and leave a note on the important ones with `sonar_update_keyword_note` ("placed in title, v2.3") so the rank change can be attributed later. For an iOS app on the Agency plan with App Store Connect connected, `sonar_app_engagement` shows whether conversion (`page_view_rate`, `download_rate`) moved after the release.
 
 ## Output format
 
-**Current baseline:** ASO score, weak sub-scores, current fields with char counts.
+**Current baseline:** ASO score, weak checks, current fields with char counts.
 
 **Variants:**
 

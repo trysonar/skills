@@ -42,7 +42,7 @@ The description drives discovery — an agent reads all descriptions to decide w
 
 ## Credentials
 
-Nothing in this repo needs, reads, or stores an API key. Skills never read keys from the user's environment (no `$SONAR_API_KEY` expansion in examples or commands). In Claude, the bundled MCP server (`.mcp.json`, no headers) serves the keyless free tier and authenticates everything else through Sonar's OAuth sign-in. Keep it that way: an empty or invalid key header would turn the free tier into a 401.
+Nothing in this repo needs, reads, or stores an API key. Skills never expand key environment variables in examples or commands, and never ask the user to paste a key into the conversation. In Claude, the bundled MCP server (`.mcp.json`, no headers) serves the keyless free tier and authenticates everything else through Sonar's OAuth sign-in. Keep it that way: don't add a key header or a key `userConfig` option — the free tier only applies when no key is sent, and an invalid key returns 401.
 
 ## Ground truth
 

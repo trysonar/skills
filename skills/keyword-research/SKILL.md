@@ -2,7 +2,7 @@
 name: keyword-research
 description: When the user wants to discover, evaluate, or prioritize App Store or Google Play keywords. Also use when the user mentions "keyword research", "find keywords", "search volume", "keyword difficulty", "keyword ideas", "what keywords should I target", or "ASO keywords". For implementing keywords into metadata, see metadata-optimization. For competitor keyword gaps, see competitor-analysis. For ongoing tracking of chosen keywords, see rank-tracking.
 metadata:
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # Keyword research
@@ -18,24 +18,30 @@ You are an expert ASO keyword researcher. Your goal is to find high-value keywor
 
 ## Research process
 
+### Phase 0: Check what Sonar already found (tracked apps)
+
+If the app is tracked in the user's Sonar workspace (Indie or Agency plan), call `sonar_discovered_keywords` with its `app_id` (from `sonar_list_apps`) first. It returns keywords Sonar's discovery engine already verified but the user doesn't track yet — `ranked` (the app already ranks, unnoticed), `gap` (a competitor ranks, the app doesn't), and `idea` — each with popularity, difficulty, `ai_relevance`, and an `opportunity` score (0–100, best first). Filter with `bucket`, `country`, `min_relevance`, or `min_opportunity`. This often answers "what should I target" without spending credits on fresh research.
+
 ### Phase 1: Expand
 
-For each seed, call `sonar_keyword_search` (10 credits) — it returns the seed plus ~10 related keyword ideas, each with full metrics. Alternatively, widen cheaply first with `sonar_keyword_suggestions` (1 credit, autocomplete only, no difficulty) and then score the interesting ones in bulk.
+For each seed, call `sonar_keyword_search` (10 credits) — it returns the seed plus related autocomplete keywords, each with popularity, difficulty, and results count. To widen cheaply first, use `sonar_keyword_suggestions` (1 credit, works without an account; autocomplete terms with a priority score, no difficulty) and then score the interesting ones in bulk.
 
 ### Phase 2: Score
 
-Batch-evaluate candidate lists with `sonar_keyword_metrics` (1 credit per keyword, up to 25 per call). Response fields:
+Batch-evaluate candidate lists with `sonar_keyword_metrics` (`keywords`, up to 25 per call; 1 credit per keyword, or 5 keywords/day without an account). Response fields:
 
-- `popularity` — 0–100 search demand. On iOS this is **real Apple Search Popularity** where available (`popularity_source: "apple"`), not a proxy
+- `popularity` — 0–100 search demand. On iOS this is **real Apple Search Popularity** where available (`popularity_source: "apple"`), otherwise a proxy estimate (`popularity_source: "proxy"`)
 - `difficulty` — 0–100 competition strength
-- `est_downloads_at_1` — estimated downloads/day for the #1 ranked app (iOS, order of magnitude)
-- `difficulty_breakdown` — `titleMatches`, `top3Strength`, `medianStrength`, `weakSpotRank`, and `beatable`
+- `est_downloads_at_1` — estimated downloads/day for the #1 ranked app (iOS only, order of magnitude)
+- `difficulty_breakdown` — `titleMatches`, `appsAnalyzed`, `top3Strength`, `medianStrength`, `weakSpotRank`, and `beatable`
+- `stale: true` — served from a stored value while a refresh runs; fine for prioritizing
+- `pending` (per keyword) — the term is queued for computation and not charged; the tool already re-checks briefly, so if it's still pending, call again after `retry_after_seconds`
 
-**`beatable: true` is the shortlist signal**: a top-3 slot looks winnable because an app holds it with ≥10x less strength than the SERP median, or the term is under-targeted in titles. Always explain *why* a keyword is beatable using the breakdown, not just the score.
+**`beatable: true` is the shortlist signal**: a top-3 slot looks winnable because an app holds it with ≥10x less strength than the SERP median, or the term is under-targeted in titles (≤3 title matches) and the weakest top-3 app is small. Always explain *why* a keyword is beatable using the breakdown (`weakSpotRank`, `top3Strength` vs `medianStrength`, `titleMatches`), not just the score.
 
 ### Phase 3: Inspect the SERP
 
-For the top 3–5 candidates, call `sonar_keyword_search` on the exact term to see the top-ranking apps: who owns the keyword, their review counts and ratings, and whether the leaders actually target the term in their titles.
+For the top 3–5 candidates, call `sonar_app_search` with the exact keyword as `query` (results come back in store ranking order, `num` up to 50): who owns the keyword, their ratings and review counts, and whether the leaders actually target the term in their titles.
 
 ### Phase 4: Group into a strategy
 
@@ -50,7 +56,7 @@ For the top 3–5 candidates, call `sonar_keyword_search` on the exact term to s
 Opportunity = (Popularity × 0.4) + ((100 − Difficulty) × 0.3) + (Relevance × 0.3)
 ```
 
-Relevance is your judgment (0–100) of fit between the keyword and the app. A `beatable: true` flag outranks a slightly higher opportunity score.
+Relevance is your judgment (0–100) of fit between the keyword and the app. A `beatable: true` flag outranks a slightly higher opportunity score. For rows from `sonar_discovered_keywords`, Sonar's own `opportunity` and `ai_relevance` are already computed — use them rather than recomputing.
 
 ## Output format
 
@@ -71,7 +77,7 @@ Subtitle (30 chars):  [secondary keywords as a benefit statement]
 Keyword field (100):  [remaining terms, comma-separated, no spaces]  (iOS only)
 ```
 
-**Recommendations:** immediate metadata changes, keywords to track daily, gaps worth building features for.
+**Recommendations:** immediate metadata changes, keywords to track daily (`sonar_track_keywords` if the app is tracked), gaps worth building features for.
 
 ## Store rules
 

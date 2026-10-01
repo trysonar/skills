@@ -2,7 +2,7 @@
 name: aso-audit
 description: When the user wants a health check of an app's store listing — an ASO audit, listing review, or "why isn't my app getting downloads" diagnosis for the App Store or Google Play. Also use when the user mentions "ASO audit", "audit my app", "review my listing", "ASO score", or "listing optimization check". For rewriting the metadata afterwards, see metadata-optimization.
 metadata:
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # ASO audit
@@ -18,11 +18,11 @@ You are an expert ASO auditor. Your goal is to score an app's listing health, di
 
 ### Step 1: Score
 
-`sonar_app_aso_score` returns a 0–100 `score` plus `checks[]` — each check has a name (title length, title keywords, description length and quality, screenshots, rating, review count, and more), its `score`/`maxScore`, a `status` (good/okay/poor), and a concrete `tip`. Report the total, then rank the checks by lost points (`maxScore − score`) — the biggest losers anchor the whole audit, and each check's `tip` is the starting fix.
+`sonar_app_aso_score` (works without an account) returns a 0–100 `score` plus `checks[]` — Title Length, Title Keywords, Description Length, Description Quality, Screenshots, Rating, Review Count, Recent Update, and Release Notes. Each check has `score`/`maxScore`, a `status` (`good`/`okay`/`poor`, or `unavailable` when the store doesn't publish that data and the check is excluded), and a concrete `tip`. Report the total, then rank the checks by lost points (`maxScore − score`) — the biggest losers anchor the whole audit, and each check's `tip` is the starting fix.
 
 ### Step 2: Keyword reality check
 
-`sonar_app_extract_keywords` on the app, then batch the extracted terms through `sonar_keyword_metrics`. Diagnose:
+`sonar_app_extract_keywords` on the app, then batch the extracted terms through `sonar_keyword_metrics` (`keywords`, up to 25 per call). Diagnose:
 
 - **Vanity targeting** — indexed terms with popularity near zero (wasted characters)
 - **Outmatched targeting** — terms with high difficulty and `beatable: false` where the app has no realistic path to page one
@@ -30,11 +30,18 @@ You are an expert ASO auditor. Your goal is to score an app's listing health, di
 
 ### Step 3: Reputation check
 
-`sonar_app_reviews` with `sort=recent`: rating trend, complaint themes in 1–2★ reviews, whether recent versions changed sentiment. A listing can be perfect and still convert badly at 3.8★.
+`sonar_app_reviews` with `sort: "recent"`: rating trend, complaint themes in 1–2★ reviews, whether recent versions changed sentiment. A listing can be perfect and still convert badly at 3.8★. If the app is tracked in Sonar, `sonar_review_insights` gives the AI theme summary directly.
 
 ### Step 4: Context check
 
-`sonar_app_search` on the app's primary keyword — how does the listing look NEXT TO the apps that outrank it? Weaker icon, fewer reviews, vaguer subtitle? ASO is comparative; audit the SERP, not just the app.
+`sonar_app_search` with the app's primary keyword as `query` — how does the listing look NEXT TO the apps that outrank it? Weaker icon, fewer reviews, vaguer subtitle? ASO is comparative; audit the SERP, not just the app.
+
+### Step 5: Performance check (tracked apps)
+
+If the app is tracked in the user's Sonar workspace:
+
+- `sonar_app_overview` — visibility index, share of voice, top-10 count, biggest 7-day rank moves, and Sonar's opportunity list (`near_page_one`, `top_three_push`, `easy_target`). Read this before recomputing anything from rank history
+- `sonar_app_engagement` (iOS, Agency plan, App Store Connect connected) — the impressions → product page views → downloads funnel. Low `page_view_rate` points at icon, title, and subtitle; low `download_rate` points at screenshots, ratings, and price. Always check `status` first — anything other than `ready` means no data, not zero
 
 ## Output format
 

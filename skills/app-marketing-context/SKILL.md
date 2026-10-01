@@ -2,7 +2,7 @@
 name: app-marketing-context
 description: When the user wants to set up, save, or update reusable marketing context for their app — the app's identity, audience, competitors, keywords, and goals — so every other Sonar skill starts informed instead of asking the same questions again. Also use when the user mentions "set up my app context", "remember my app", "marketing context", or at the start of a long ASO engagement. All other skills check for this file first.
 metadata:
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # App marketing context
@@ -19,6 +19,7 @@ Ask for the app (store id or name), then pull live data instead of interrogating
 - `sonar_app_aso_score` — current listing health baseline
 - `sonar_app_extract_keywords` — what the listing currently targets
 - `sonar_app_search` on the core keywords — the actual SERP competitors
+- If the app is tracked in Sonar: `sonar_list_products` / `sonar_list_apps` for the workspace ids, and `sonar_app_overview` for the current visibility and top-10 counts
 
 Then ask only what data can't tell you: target audience, business model and goals, markets that matter, known rivals the SERP missed, and constraints (brand rules, localization budget).
 
@@ -33,6 +34,7 @@ Updated: [date]
 
 ## App
 - Store ids: ios [id] / android [id]
+- Sonar workspace (if tracked): product_id [uuid], app ids ios [uuid] / android [uuid]
 - Category, price model, current rating and review count
 - One-line positioning
 
@@ -47,8 +49,9 @@ Updated: [date]
 - Countries tracked: ...
 
 ## Baselines ([date])
-- ASO score: N/100 — weak factors: ...
-- Est. downloads/mo, revenue/mo (Sonar estimates)
+- ASO score: N/100 — weak checks: ...
+- Est. revenue/mo (Sonar estimate, with its confidence grade); Android installs or iOS rating count
+- Visibility and top-10 keyword count (if tracked in Sonar)
 
 ## Goals and constraints
 - 90-day goal, brand rules, no-go areas
