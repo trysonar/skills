@@ -9,6 +9,8 @@
   },
   "homepage": "https://trysonar.app/docs/mcp",
   "privacyPolicyUrl": "https://trysonar.app/privacy",
+  "termsOfServiceUrl": "https://trysonar.app/terms",
+  "supportUrl": "https://trysonar.app/support",
   "repository": "https://github.com/trysonar/skills",
   "license": "MIT",
   "keywords": [
