@@ -1,0 +1,17 @@
+{
+  "name": "trysonar",
+  "description": "Sonar's App Store Optimization plugin for Claude: ASO workflow skills plus the hosted Sonar MCP server.",
+  "owner": {
+    "name": "Edge Analytics s.r.o.",
+    "url": "https://trysonar.app"
+  },
+  "plugins": [
+    {
+      "name": "sonar-aso",
+      "source": "./",
+      "description": "App Store Optimization for the App Store and Google Play: keyword research, metadata, competitors, audits, reviews, revenue, top charts, rank tracking, and screenshots.",
+      "category": "marketing",
+      "tags": ["aso", "app-store", "google-play", "keyword-research", "mcp"]
+    }
+  ]
+}
