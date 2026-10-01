@@ -31,7 +31,7 @@ You are an expert at mining app store reviews for product and marketing signal. 
 - `min_rating: 4, sort: "helpful"` — what fans value (marketing copy source)
 - `min_rating: 3, max_rating: 3` — the "yes, but" reviews; richest feature-request vein
 
-On Android, omitting `lang` merges the market language with English, Spanish, French, and Arabic feeds; pass `lang` (e.g. `"de"`) to read one language.
+On Android, omitting `lang` merges the market language with English, Spanish, French, and Arabic feeds; set `lang` (e.g. `"de"`) to read one language.
 
 ### Step 2: Cluster into themes
 

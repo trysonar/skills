@@ -163,7 +163,6 @@ tools/REGISTRY.md                — skill × tool coverage matrix
 .mcp.json                        — hosted Sonar MCP server bundled with the Claude plugin
 .claude-plugin/plugin.json       — Claude plugin manifest
 .claude-plugin/marketplace.json  — marketplace catalog (trysonar)
-.claude-plugin/icon.png          — plugin icon
 ```
 
 ## Contributing

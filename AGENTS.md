@@ -13,7 +13,6 @@ tools/REGISTRY.md                — capability matrix: which skill uses which t
 .mcp.json                        — hosted Sonar MCP server bundled with the plugin
 .claude-plugin/plugin.json       — Claude plugin manifest (name, version, metadata)
 .claude-plugin/marketplace.json  — marketplace catalog, so `/plugin marketplace add trysonar/skills` works
-.claude-plugin/icon.png          — plugin icon (square PNG, 1024px)
 ```
 
 Compatible directories: `.claude/skills/`, `.cursor/skills/`, `.agents/skills/`, `.codex/skills/`
